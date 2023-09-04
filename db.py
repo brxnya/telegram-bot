@@ -13,7 +13,7 @@ def init(force: bool = False):
                 user_id         INT     PRIMARY KEY NOT NULL,
                 user_name       TEXT    NOT NULL,
                 user_weight     FLOAT,
-                user_height     INT)
+                user_height     FLOAT)
             """)
     conn.commit()
     c.close()
@@ -37,6 +37,20 @@ def check_user(user_id: int) -> bool:
     return False
 
 
-# def change_user_params(weight: float, height: int):
-#     c = conn.cursor()
-#     c.close()
+def get_user_params(user_id: int) -> tuple:
+    c = conn.cursor()
+    c.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
+    result = c.fetchone()
+    c.close()
+    return result
+
+
+def change_user_params(user_id: int, weight=None, height=None):
+    c = conn.cursor()
+    if weight:
+        c.execute("UPDATE users SET user_weight = ? WHERE user_id = ?", (weight, user_id))
+        conn.commit()
+    elif height:
+        c.execute("UPDATE users SET user_height = ? WHERE user_id = ?", (height, user_id))
+        conn.commit()
+    c.close()
