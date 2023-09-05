@@ -2,8 +2,15 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 menu = [
     [
-        InlineKeyboardButton(text="Изменить рост", callback_data="set_param_height"),
-        InlineKeyboardButton(text="Изменить вес", callback_data="set_param_weight")
+        InlineKeyboardButton(text="Выбрать пол", callback_data="set_param_gender"),
+        InlineKeyboardButton(text="Указать возраст", callback_data="set_param_age")
+    ],
+    [
+        InlineKeyboardButton(text="Указать рост", callback_data="set_param_height"),
+        InlineKeyboardButton(text="Указать вес", callback_data="set_param_weight")
+    ],
+    [
+        InlineKeyboardButton(text="Указать физическую активность", callback_data="set_param_activity")
     ],
     [
         InlineKeyboardButton(text="Готово", callback_data="params_complete")

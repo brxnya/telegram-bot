@@ -10,24 +10,31 @@ def init(force: bool = False):
 
     c.execute("""
             CREATE TABLE IF NOT EXISTS users (
-                user_id         INT     PRIMARY KEY NOT NULL,
-                user_name       TEXT    NOT NULL,
-                user_weight     FLOAT,
-                user_height     FLOAT)
+                user_id                 INT     PRIMARY KEY NOT NULL,
+                user_name               TEXT    NOT NULL,
+                user_gender             TEXT,
+                user_age                INT,
+                user_weight             FLOAT,
+                user_height             FLOAT,
+                user_physical_activity  TEXT
+                )
             """)
     conn.commit()
     c.close()
 
 
-def add_new_user(user_id: int, full_name: str, weight: float, height: int):
+def add_new_user(user_id: int, name: str, gender: str, age: int, weight: float, height: float, activity: str):
     c = conn.cursor()
-    c.execute("INSERT INTO users (user_id, user_name, user_weight, user_height) VALUES (?, ?, ?, ?)",
-              (user_id, full_name, weight, height))
+    c.execute("""
+            INSERT INTO users
+            (user_id, user_name, user_gender, user_age, user_weight, user_height, user_physical_activity)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, (user_id, name, gender, age, weight, height, activity))
     conn.commit()
     c.close()
 
 
-def check_user(user_id: int) -> bool:
+def check_new_user(user_id: int) -> bool:
     c = conn.cursor()
     c.execute("SELECT user_id FROM users WHERE user_id = ?", (user_id, ))
     selected = c.fetchone()
