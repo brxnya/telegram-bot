@@ -17,7 +17,7 @@ async def send_welcome(message: types.Message):
         db.add_new_user(message.chat.id, message.chat.full_name, 0, 0)
     user_params = db.get_user_params(message.chat.id)
     await message.answer(
-        f"Привет, <b>{user_params[1]}</b>, рад видеть тебя!\n\n"
+        f"Привет, <b>{user_params[1]}</b>, рад тебя видеть!\n\n"
         "Твои параметры:\n\n"
         f"<i>Рост</i>:    <b>{'не указано' if user_params[3] == 0.0 else user_params[3]}</b> <i>см</i>\n"
         f"<i>Вес</i>:      <b>{'не указано' if user_params[2] == 0.0 else user_params[2]}</b> <i>кг</i>\n",
@@ -77,13 +77,33 @@ async def callbacks_num(callback: types.CallbackQuery):
     elif action == "finish":
         await callback.message.delete()
         if user_data.get(callback.message.chat.id)[1] == "set_param_height":
-            db.change_user_params(callback.message.chat.id, height=user_data.pop(callback.message.chat.id)[0])
+            height = round(user_data.get(callback.message.chat.id)[0], 1)
+            db.change_user_params(callback.message.chat.id, height=height)
+            del user_data[callback.message.chat.id]
         elif user_data.get(callback.message.chat.id)[1] == "set_param_weight":
-            db.change_user_params(callback.message.chat.id, weight=user_data.pop(callback.message.chat.id)[0])
+            weight = round(user_data.get(callback.message.chat.id)[0], 1)
+            db.change_user_params(callback.message.chat.id, weight=weight)
+            del user_data[callback.message.chat.id]
         await send_welcome(callback.message)
 
     await callback.answer()
 
+
+@dp.callback_query_handler(lambda c: c.data == "params_complete")
+async def alert(callback: types.CallbackQuery):
+    user_params = db.get_user_params(callback.message.chat.id)
+    bmi = round(user_params[2]/(user_params[3]/100)**2, 1)
+    rec_mass1 = round(18.5 * (user_params[3]/100)**2, 1)
+    rec_mass2 = round(25.0 * (user_params[3]/100)**2, 1)
+    await callback.message.edit_text(
+        f"Привет, <b>{user_params[1]}</b>, рад тебя видеть!\n\n"
+        "Твои параметры:\n\n"
+        f"<i>Рост</i>:    <b>{'не указано' if user_params[3] == 0.0 else user_params[3]}</b> <i>см</i>\n"
+        f"<i>Вес</i>:      <b>{'не указано' if user_params[2] == 0.0 else user_params[2]}</b> <i>кг</i>\n\n"
+        f"Твой ИМТ:  <b>{bmi}</b> <i>кг/м²</i>, норма: от 18.5 до 25 <i>кг/м²</i>\n"
+        f"Норма массы тела: <b>{rec_mass1}</b> - <b>{rec_mass2}</b> <i>кг</i>",
+        parse_mode='HTML',
+    )
 
 if __name__ == '__main__':
     db.init()
