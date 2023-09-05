@@ -15,7 +15,7 @@ def init(force: bool = False):
                 user_gender             TEXT,
                 user_age                INT,
                 user_weight             FLOAT,
-                user_height             FLOAT,
+                user_height             INT,
                 user_physical_activity  TEXT
                 )
             """)
@@ -23,7 +23,7 @@ def init(force: bool = False):
     c.close()
 
 
-def add_new_user(user_id: int, name: str, gender: str, age: int, weight: float, height: float, activity: str):
+def add_new_user(user_id: int, name: str, gender: str, age: int, weight: float, height: int, activity: str):
     c = conn.cursor()
     c.execute("""
             INSERT INTO users
@@ -36,7 +36,7 @@ def add_new_user(user_id: int, name: str, gender: str, age: int, weight: float, 
 
 def check_new_user(user_id: int) -> bool:
     c = conn.cursor()
-    c.execute("SELECT user_id FROM users WHERE user_id = ?", (user_id, ))
+    c.execute("SELECT user_id FROM users WHERE user_id = ?", (user_id,))
     selected = c.fetchone()
     c.close()
     if not selected:
@@ -52,12 +52,21 @@ def get_user_params(user_id: int) -> tuple:
     return result
 
 
-def change_user_params(user_id: int, weight=None, height=None):
+def change_user_params(user_id: int, gender=None, age=None, weight=None, height=None, activity=None):
     c = conn.cursor()
-    if weight:
+    if gender:
+        c.execute("UPDATE users SET user_gender = ? WHERE user_id = ?", (gender, user_id))
+        conn.commit()
+    elif age:
+        c.execute("UPDATE users SET user_age = ? WHERE user_id = ?", (age, user_id))
+        conn.commit()
+    elif weight:
         c.execute("UPDATE users SET user_weight = ? WHERE user_id = ?", (weight, user_id))
         conn.commit()
     elif height:
         c.execute("UPDATE users SET user_height = ? WHERE user_id = ?", (height, user_id))
+        conn.commit()
+    elif activity:
+        c.execute("UPDATE users SET user_physical_activity = ? WHERE user_id = ?", (activity, user_id))
         conn.commit()
     c.close()
