@@ -5,8 +5,8 @@ import db
 import kb
 
 API_TOKEN = ''
-
-dp = Dispatcher(Bot(API_TOKEN))
+# proxy_url = 'http://proxy.server:3128'
+dp = Dispatcher(Bot(API_TOKEN))  # proxy=proxy_url
 
 user_data = {}
 
@@ -70,79 +70,83 @@ async def update_params(message: types.Message, new_value):
     lambda c: c.data == "set_param_gender" or c.data == "set_param_age" or c.data == "set_param_weight" or
     c.data == "set_param_height" or c.data == "set_param_activity" or c.data == "male" or c.data == "female" or
     c.data == "low_act" or c.data == "below_average_act" or c.data == "average_act" or c.data == "above_average_act" or
-    c.data == "high_act")
+    c.data == "high_act" or c.data == "empty")
 async def cmd_params(callback: types.CallbackQuery):
-    if callback.data == "set_param_gender":
-        await callback.message.edit_text(
-            f"Выбери пол:",
-            reply_markup=kb.get_kb_gender()
-        )
-    elif callback.data == "set_param_age":
-        value = db.get_user_params(callback.from_user.id)[3]
-        if value == 0:
-            value += 20
-        user_data[callback.message.chat.id] = [value, callback.data]
-        await callback.message.edit_text(
-            f"Укажи возраст: {user_data.get(callback.message.chat.id)[0]}",
-            reply_markup=kb.get_kb_height()
-        )
-    elif callback.data == "set_param_weight":
-        value = db.get_user_params(callback.from_user.id)[4]
-        if value == 0.0:
-            value += 68
-        user_data[callback.message.chat.id] = [value, callback.data]
-        await callback.message.edit_text(
-            f"Укажи вес: {user_data.get(callback.message.chat.id)[0]} кг",
-            reply_markup=kb.get_kb_weight()
-        )
-    elif callback.data == "set_param_height":
-        value = db.get_user_params(callback.from_user.id)[5]
-        if value == 0:
-            value += 165
-        user_data[callback.message.chat.id] = [value, callback.data]
-        await callback.message.edit_text(
-            f"Укажи рост: {user_data.get(callback.message.chat.id)[0]} см",
-            reply_markup=kb.get_kb_height()
-        )
-    elif callback.data == "set_param_activity":
-        await callback.message.edit_text(
-            "Выбери уровень физической активности:\n\n"
-            "Низкий — если у тебя нет физических нагрузок и сидячая работа\n"
-            "Ниже среднего — если ты совершаешь небольшие пробежки или делаешь легкую гимнастику 1–3 раза в неделю\n"
-            "Средний — если ты занимаешься спортом со средними нагрузками 3–5 раз в неделю\n"
-            "Выше среднего — если ты полноценно тренируешься 6–7 раз в неделю\n"
-            "Высокий — если твоя работа связана с физическим трудом, ты тренируешься 2 раза в день и "
-            "включаешь в программу тренировок силовые упражнения",
-            reply_markup=kb.get_kb_activity()
-        )
-    elif callback.data == "male":
-        await callback.message.delete()
-        db.change_user_params(callback.message.chat.id, gender='Мужской')
-        await send_welcome(callback.message)
-    elif callback.data == "female":
-        await callback.message.delete()
-        db.change_user_params(callback.message.chat.id, gender='Женский')
-        await send_welcome(callback.message)
-    elif callback.data == "low_act":
-        await callback.message.delete()
-        db.change_user_params(callback.message.chat.id, activity='Низкий')
-        await send_welcome(callback.message)
-    elif callback.data == "below_average_act":
-        await callback.message.delete()
-        db.change_user_params(callback.message.chat.id, activity='Ниже среднего')
-        await send_welcome(callback.message)
-    elif callback.data == "average_act":
-        await callback.message.delete()
-        db.change_user_params(callback.message.chat.id, activity='Средний')
-        await send_welcome(callback.message)
-    elif callback.data == "above_average_act":
-        await callback.message.delete()
-        db.change_user_params(callback.message.chat.id, activity='Выше среднего')
-        await send_welcome(callback.message)
-    elif callback.data == "high_act":
-        await callback.message.delete()
-        db.change_user_params(callback.message.chat.id, activity='Высокий')
-        await send_welcome(callback.message)
+    match callback.data:
+        case "set_param_gender":
+            await callback.message.edit_text(
+                f"Выбери пол:",
+                reply_markup=kb.get_kb_gender()
+            )
+        case "set_param_age":
+            value = db.get_user_params(callback.from_user.id)[3]
+            if value == 0:
+                value += 20
+            user_data[callback.message.chat.id] = [value, callback.data]
+            await callback.message.edit_text(
+                f"Укажи возраст: {user_data.get(callback.message.chat.id)[0]}",
+                reply_markup=kb.get_kb_height()
+            )
+        case "set_param_weight":
+            value = db.get_user_params(callback.from_user.id)[4]
+            if value == 0.0:
+                value += 68
+            user_data[callback.message.chat.id] = [value, callback.data]
+            await callback.message.edit_text(
+                f"Укажи вес: {user_data.get(callback.message.chat.id)[0]} кг",
+                reply_markup=kb.get_kb_weight()
+            )
+        case "set_param_height":
+            value = db.get_user_params(callback.from_user.id)[5]
+            if value == 0:
+                value += 165
+            user_data[callback.message.chat.id] = [value, callback.data]
+            await callback.message.edit_text(
+                f"Укажи рост: {user_data.get(callback.message.chat.id)[0]} см",
+                reply_markup=kb.get_kb_height()
+            )
+        case "set_param_activity":
+            await callback.message.edit_text(
+                "Выбери уровень физической активности:\n\n"
+                "Низкий — если у тебя нет физических нагрузок и сидячая работа\n"
+                "Ниже среднего — если ты совершаешь небольшие пробежки или делаешь легкую гимнастику 1–3 "
+                "раза в неделю\n"
+                "Средний — если ты занимаешься спортом со средними нагрузками 3–5 раз в неделю\n"
+                "Выше среднего — если ты полноценно тренируешься 6–7 раз в неделю\n"
+                "Высокий — если твоя работа связана с физическим трудом, ты тренируешься 2 раза в день и "
+                "включаешь в программу тренировок силовые упражнения",
+                reply_markup=kb.get_kb_activity()
+            )
+        case "male":
+            await callback.message.delete()
+            db.change_user_params(callback.message.chat.id, gender='Мужской')
+            await send_welcome(callback.message)
+        case "female":
+            await callback.message.delete()
+            db.change_user_params(callback.message.chat.id, gender='Женский')
+            await send_welcome(callback.message)
+        case "low_act":
+            await callback.message.delete()
+            db.change_user_params(callback.message.chat.id, activity='Низкий')
+            await send_welcome(callback.message)
+        case "below_average_act":
+            await callback.message.delete()
+            db.change_user_params(callback.message.chat.id, activity='Ниже среднего')
+            await send_welcome(callback.message)
+        case "average_act":
+            await callback.message.delete()
+            db.change_user_params(callback.message.chat.id, activity='Средний')
+            await send_welcome(callback.message)
+        case "above_average_act":
+            await callback.message.delete()
+            db.change_user_params(callback.message.chat.id, activity='Выше среднего')
+            await send_welcome(callback.message)
+        case "high_act":
+            await callback.message.delete()
+            db.change_user_params(callback.message.chat.id, activity='Высокий')
+            await send_welcome(callback.message)
+        case "empty":
+            await callback.answer('Этот раздел в разработке...')
 
 
 @dp.callback_query_handler(F.data.startswith("num_"))
@@ -200,7 +204,7 @@ async def alert(callback: types.CallbackQuery):
     rec_mass = rec_mass_calc(user_params[5])
     calorie = calorie_calc(user_params[2], user_params[3], user_params[4], user_params[5], user_params[6])
     await callback.message.edit_text(
-        f"Твои параметры:\n\n"
+        f"Твои параметры, {user_params[1]}:\n\n"
         f"<i>Пол</i>:    <b>{'не указано' if user_params[2] == 'not specified' else user_params[2]}</b>\n"
         f"<i>Возраст</i>:    <b>{'не указано' if user_params[3] == 0 else user_params[3]}</b>\n"
         f"<i>Вес</i>:    <b>{'не указано' if user_params[4] == 0.0 else user_params[4]}</b>\n"
