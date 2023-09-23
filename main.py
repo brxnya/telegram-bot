@@ -70,7 +70,7 @@ async def update_params(message: types.Message, new_value):
     lambda c: c.data == "set_param_gender" or c.data == "set_param_age" or c.data == "set_param_weight" or
     c.data == "set_param_height" or c.data == "set_param_activity" or c.data == "male" or c.data == "female" or
     c.data == "low_act" or c.data == "below_average_act" or c.data == "average_act" or c.data == "above_average_act" or
-    c.data == "high_act" or c.data == "empty")
+    c.data == "high_act" or c.data == "meal_plan" or c.data == "main_menu")
 async def cmd_params(callback: types.CallbackQuery):
     match callback.data:
         case "set_param_gender":
@@ -147,10 +147,10 @@ async def cmd_params(callback: types.CallbackQuery):
             await send_welcome(callback.message)
         case "meal_plan":
             await callback.message.edit_text(
-                f"<i>Зачем заново изобретать велосипед, правильно? Есть хороший сайт:</i> "
+                "<i>Зачем заново изобретать велосипед, правильно? Есть хороший сайт:</i> "
                 "<a href='http://3-x-15.ru/'>клац</a>",
                 parse_mode='HTML',
-                reply_markup=kb.get_kb_main_menu()
+                reply_markup=kb.get_kb_go_main()
             )
         case "main_menu":
             await callback.message.delete()
