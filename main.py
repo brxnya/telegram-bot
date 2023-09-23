@@ -145,8 +145,16 @@ async def cmd_params(callback: types.CallbackQuery):
             await callback.message.delete()
             db.change_user_params(callback.message.chat.id, activity='Высокий')
             await send_welcome(callback.message)
-        case "empty":
-            await callback.answer('Этот раздел в разработке...')
+        case "meal_plan":
+            await callback.message.edit_text(
+                f"<i>Зачем заново изобретать велосипед, правильно? Есть хороший сайт:</i> "
+                "<a href='http://3-x-15.ru/'>клац</a>",
+                parse_mode='HTML',
+                reply_markup=kb.get_kb_main_menu()
+            )
+        case "main_menu":
+            await callback.message.delete()
+            await send_welcome(callback.message)
 
 
 @dp.callback_query_handler(F.data.startswith("num_"))

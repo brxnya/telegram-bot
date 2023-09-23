@@ -85,7 +85,15 @@ def get_kb_activity():
 
 def get_kb_dietary_ration():
     buttons = [
-        [InlineKeyboardButton(text="Составить рацион питания", callback_data="empty")]
+        [InlineKeyboardButton(text="Составить план питания", callback_data="meal_plan")]
+    ]
+    keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
+    return keyboard
+
+
+def get_kb_go_main():
+    buttons = [
+        [InlineKeyboardButton(text="Главное меню", callback_data="main_menu")]
     ]
     keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
     return keyboard
